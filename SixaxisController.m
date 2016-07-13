@@ -33,7 +33,7 @@ static IOReturn Set_DeviceFeatureReport(IOHIDDeviceRef inIOHIDDeviceRef, CFIndex
 		result = IOHIDDeviceSetReport(inIOHIDDeviceRef, kIOHIDReportTypeFeature, inReportID, inReportBuffer, inReportSize);
 		
 		if (noErr != result) {
-			printf("%s, IOHIDDeviceSetReport error: %ld (0x%08lX ).\n", __PRETTY_FUNCTION__, (long int) result, (long int) result);
+			printf("%s, IOHIDDeviceSetReport error: %ld (0x%08lX).\n", __PRETTY_FUNCTION__, (long int) result, (long int) result);
 		}
 	}
 	return(result);
@@ -51,19 +51,24 @@ static IOReturn PS3_SetMasterBluetoothAddress(IOHIDDeviceRef inIOHIDDeviceRef, B
 	
 }
 static void Handle_DeviceMatchingCallback(void* inContext, IOReturn inResult, void* inSender, IOHIDDeviceRef inIOHIDDeviceRef) {
-	
-	// Device VendorID/ProductID:   0x054C/0x0268   (Sony Corporation)
-	long vendorID = IOHIDDevice_GetVendorID(inIOHIDDeviceRef);
-	long productID = IOHIDDevice_GetProductID(inIOHIDDeviceRef);
-	
-	if ((0x054C != vendorID) || (0x0268 != productID)) {
-		return;
-	}
-	NSLog(@"Found PS3 Controller!");
-	gIOHIDDeviceRef = inIOHIDDeviceRef;
-	if ([sharedInstance delegate] && [[sharedInstance delegate] respondsToSelector:@selector(ps3ControllerDidConnect)]) {
-		[[sharedInstance delegate] ps3ControllerDidConnect];
-	}
+    
+    // Device VendorID/ProductID:   0x054C/0x0268   (Sony Corporation)
+    // Product ID of Playstation 4 controller: 0x05c4
+    long vendorID = IOHIDDevice_GetVendorID(inIOHIDDeviceRef);
+    long productID = IOHIDDevice_GetProductID(inIOHIDDeviceRef);
+    
+    bool isPS4Controller = 0x05C4 == productID;
+    bool isPS3Controller = 0x0268 == productID;
+    bool isSonyProduct = 0x054C == vendorID;
+    
+    if (isSonyProduct && ( isPS3Controller || isPS4Controller )) {
+        return;
+    }
+    NSLog(@"Found PS3 Controller!");
+    gIOHIDDeviceRef = inIOHIDDeviceRef;
+    if ([sharedInstance delegate] && [[sharedInstance delegate] respondsToSelector:@selector(ps3ControllerDidConnect)]) {
+        [[sharedInstance delegate] ps3ControllerDidConnect];
+    }
 }
 static void Handle_RemovalCallback(void* inContext, IOReturn inResult, void* inSender, IOHIDDeviceRef inIOHIDDeviceRef) {
 	
