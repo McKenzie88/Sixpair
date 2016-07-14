@@ -37,13 +37,13 @@ static PairingController *sharedInstance;
 }
 - (void)ps3ControllerDidConnect {
 	sixaxisConnected = YES;
-	[controllerLabel setStringValue:@"PS3 Sixaxis Controller connected"];
+	[controllerLabel setStringValue:@"Dualshock Controller connected"];
 	[self updateButtonVisibility];
 }
 - (void)ps3ControllerDidDisconnect {
 	sixaxisConnected = NO;
     sixaxisPaired = NO;
-	[controllerLabel setStringValue:@"Connect a PS3 Controller (over USB)"];
+	[controllerLabel setStringValue:@"Connect a PS3/PS4 Controller (over USB)"];
 	[self updateButtonVisibility];
 }
 - (void)dealloc {
